@@ -24,5 +24,11 @@ Documentation is done with [PDoc](http://pdoc.org).
 
 Rake Tasks
 ==========
+rake build              # Build all dist files
+rake build:base         # Builds base dist fill (not compressed)
+rake build:full         # Builds full dist fill (not compressed)
+rake build:packed_base  # Builds base dist fill (compressed by yui compressor)
+rake build:packed_full  # Builds full dist fill (compressed by yui compressor)
+rake doc                # Generates documentation
 
 ProtoFX is still under development and any contributions are welcome.
