@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+  	<title>Prototype FX</title>
+	
+    <script type="text/javascript" src="../lib/prototype.js"></script>
+    <script type="text/javascript" src="../dist/protofx_packed.js"></script>
+  
+    <link rel="stylesheet" href="css/demo.css" type="text/css" >
+  </head>
+
+  <body>
+    <div id='block1'>
+      Bla Bla Bla
+    </div>
+
+    <script type="text/javascript">
+    document.observe('dom:loaded', function() {
+      var attributes = {height: '400', width: '500px', opacity: 0.5, fontSize: 100, backgroundColor: "#112233", color: '#F00'};
+      var fx = new FX.Element("block1").animate(attributes);
+      fx.play();
+    });
+    </script>
+  
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+  	<title>Prototype FX</title>
+    <script type="text/javascript" src="../lib/prototype.js"></script>
+    <script type="text/javascript" src="../src/util/string.js"></script>
+  
+    <script type="text/javascript" src="../src/base/base.js"></script>
+    <script type="text/javascript" src="../src/base/transition.js"></script>
+    <script type="text/javascript" src="../src/base/attribute.js"></script>
+    <script type="text/javascript" src="../src/base/metronome.js"></script>
+    <script type="text/javascript" src="../src/fx/element.js"></script>
+
+    <script type="text/javascript" src="../src/base/score.js"></script>
+    <script type="text/javascript" src="js/demo.js"></script>
+    <link rel="stylesheet" href="css/demo.css" type="text/css"/>
+  </head>
+
+  <body>
+    <div id='ball'>
+    </div>
+    <script type="text/javascript">
+    document.observe('dom:loaded', function() {
+      FX.DefaultOptions = {duration: 2000, transition: FX.Transition.easeOutBounce};
+    
+      var w = document.viewport.getWidth()  - $('ball').getWidth();
+      var h = document.viewport.getHeight() - $('ball').getHeight();
+    
+      var fx1 = new FX.Element('ball').animate({left: w});
+      var fx2 = new FX.Element('ball').animate({top:  '-=' + h});
+      var fx3 = new FX.Element('ball').animate({left: '-=' + w});
+      var fx4 = new FX.Element('ball').animate({top:  '+=' + h});
+    
+      var group = new FX.Score('group1');
+      group.add(fx1)
+           .add(fx2, {delay: -1000, position: 'last'})
+           .add(fx3, {delay: -1000, position: 'last'})
+           .add(fx4, {delay: -1000, position: 'last'});
+    
+      fxControl(group, true, false);
+      $('ball').style.top = h + 'px';
+    });
+    generateLoremIpsum(); 
+    </script>
+
+  </body>
+</html>

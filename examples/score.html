@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+  	<title>Prototype FX</title>
+    <script type="text/javascript" src="../lib/prototype.js"></script>
+    <script type="text/javascript" src="../src/util/string.js"></script>
+
+    <script type="text/javascript" src="../src/base/base.js"></script>
+    <script type="text/javascript" src="../src/base/score.js"></script>
+    <script type="text/javascript" src="../src/base/transition.js"></script>
+    <script type="text/javascript" src="../src/base/attribute.js"></script>
+    <script type="text/javascript" src="../src/base/metronome.js"></script>
+
+    <script type="text/javascript" src="../src/fx/element.js"></script>
+
+    <script type="text/javascript" src="js/demo.js"></script>
+  
+    <link rel="stylesheet" href="css/demo.css" type="text/css"/>
+  </head>
+
+  <body>
+    <div id='block1'> Bla Bla Bla </div>
+    <div id='block2'> Bla Bla Bla </div>
+  
+    <script type="text/javascript">
+    document.observe('dom:loaded', function() {
+      FX.DefaultOptions.transition = FX.Transition.easeInOutBack;  
+      var fx1 = new FX.Element('block1').setOptions({duration:2000}).animate({height: '400'});
+      var fx2 = new FX.Element('block1').setOptions({duration:1000}).animate({width: 500});
+      var fx3 = new FX.Element('block2').setOptions({duration:500}) .animate({height: 500, left: 540, fontSize: '100'});
+      var fx4 = new FX.Element('block2').setOptions({duration:1000}).animate({backgroundColor: "#112233", color: '#F00',opacity: 0.5,  width: 400});
+          
+      var group1 = new FX.Score('group1');
+      group1.add(fx1)
+            .add(fx2, {after: fx1})
+            .add(fx3)
+            .add(fx4, {after: fx3});
+                      
+     fxControl(group1, true, false);
+    });
+    generateLoremIpsum(); 
+    </script>
+
+  </body>
+</html>
