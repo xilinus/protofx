@@ -19,7 +19,7 @@ FX.Transition = {
 }
 
 
-FX.DefaultOptions = {duration: 500, transition: FX.Transition.swing};
+FX.DefaultOptions = {duration: 500, transition: FX.Transition.swing, eventNotifier: document, memoData: null};
 /** 
  *  class FX.Base
  *
@@ -31,10 +31,10 @@ FX.Base = Class.create((function() {
    *  new FX.Base([options])
    **/
   function initialize(options) {
-    this.options     = Object.clone(FX.DefaultOptions);
+    this.options     = Object.extend(Object.clone(FX.DefaultOptions), options);
     this.currentTime = null;
     this.nextTime    = 0;
-    this.isPlaying   = false;
+    this.playing     = false;
     this.backward    = false;
 
     this.setOptions(options);
@@ -56,38 +56,57 @@ FX.Base = Class.create((function() {
   }
   
   /** 
+   *  FX.Base#isPlaying() -> true/false
+   **/
+  function isPlaying() {
+    return this.playing;
+  }
+  
+  /** 
    *  FX.Base#play() -> FX.Base
+   *  
+   *  Starts animation from current position
+   *  fires fx:started
    **/
   function play() {
-    if (this.isPlaying) return;
+    if (this.playing) return;
       
-    this.isPlaying = true;
+    this.playing = true;
 
     // Reset time for a new play
     if (this.currentTime == null) {
       this.currentTime = this.backward ? this.getDuration() : 0;
       this.startAnimation(this.backward);
     }
+
     // Add it to metronome to receive recurring updateAnimation
     FX.Metronome.register(this);
+
+    fire(this, 'fx:started');
     return this;
   }
   
   /** 
    *  FX.Base#stop() -> FX.Base
    *  
+   *  Stops animation at current running position
+   *  fires fx:stopped
    **/
   function stop() {
+    fire(this, 'fx:stopped');
     FX.Metronome.unregister(this);
-    this.isPlaying = false;
+    this.playing = false;
     return this;
   }
   
   /** 
    *  FX.Base#reverse() -> FX.Base
    *  
+   *  Reverses animation. If animation is running, it keeps running backward
+   *  fire fx:reversed
    **/
   function reverse() {
+    fire(this, 'fx:reversed');
     this.backward = !this.backward;
     return this;
   }
@@ -95,15 +114,19 @@ FX.Base = Class.create((function() {
   /** 
    *  FX.Base#rewind() -> FX.Base
    *  
+   *  Rewind animation. Depending on animation direction it goes to begin or end position
+   *  fires fx:rewinded
    **/
   function rewind() {
     // Stop before rewinding
     this.stop();
+    fire(this, 'fx:rewinded');
     this.updateAnimation(this.backward ? 1 : 0);
     this.currentTime = null;
     return this;
   }
 
+  // Function called periodically by Metronome
   function metronomeUpdate(delta) {
     // Update current time
     this.currentTime += this.backward ? -delta : delta;
@@ -113,19 +136,24 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       this.stopAnimation();
+      fire(this, 'fx:ended');
 
       FX.Metronome.unregister(this);
       
       this.currentTime = null;
-      this.isPlaying   = false;
+      this.playing   = false;
     }
     else {
       var pos = this.options.transition(this.currentTime / this.getDuration(), this.currentTime, 0, 1, this.getDuration());
       this.updateAnimation(pos);
     }
   }
+  
+  function fire(fx, eventName) {
+    fx.options.eventNotifier.fire(eventName, {fx: fx, data: fx.memoData});
+  }
 
-  // Internal functions
+  // Internal callbacks for subclasses
   function startAnimation(backward) {
   }
   
@@ -145,6 +173,7 @@ FX.Base = Class.create((function() {
     stop:            stop,
     reverse:         reverse,
     rewind:          rewind,
+    isPlaying:       isPlaying,
     metronomeUpdate: metronomeUpdate,
     startAnimation:  startAnimation,
     stopAnimation:   stopAnimation,

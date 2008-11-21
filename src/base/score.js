@@ -27,7 +27,7 @@ FX.Score = Class.create(FX.Base, (function() {
    *  
    **/
   function play($super) {
-    if (this.isPlaying)
+    if (this.playing)
       return;
       
     // Reset time for a new play
@@ -125,7 +125,7 @@ FX.Score = Class.create(FX.Base, (function() {
     if (this.currentTime > this.duration || this.currentTime <0) {
       FX.Metronome.unregister(this);
       this.currentTime = null;
-      this.isPlaying   = false;
+      this.playing   = false;
     }
   }
   
