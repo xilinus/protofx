@@ -24,7 +24,7 @@
     </div>
     <script type="text/javascript">
     document.observe('dom:loaded', function() {
-      FX.DefaultOptions = {duration: 2000, transition: FX.Transition.easeOutBounce};
+      Object.extend(FX.DefaultOptions, {duration: 2000, transition: FX.Transition.easeOutBounce});
     
       var w = document.viewport.getWidth()  - $('ball').getWidth();
       var h = document.viewport.getHeight() - $('ball').getHeight();

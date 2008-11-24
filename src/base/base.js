@@ -81,7 +81,7 @@ FX.Base = Class.create((function() {
     // Add it to metronome to receive recurring updateAnimation
     FX.Metronome.register(this);
 
-    fire(this, 'fx:started');
+    this.fire('fx:started');
     return this;
   }
   
@@ -92,7 +92,7 @@ FX.Base = Class.create((function() {
    *  fires fx:stopped
    **/
   function stop() {
-    fire(this, 'fx:stopped');
+    this.fire('fx:stopped');
     FX.Metronome.unregister(this);
     this.playing = false;
     return this;
@@ -105,7 +105,7 @@ FX.Base = Class.create((function() {
    *  fire fx:reversed
    **/
   function reverse() {
-    fire(this, 'fx:reversed');
+    this.fire('fx:reversed');
     this.backward = !this.backward;
     return this;
   }
@@ -119,7 +119,7 @@ FX.Base = Class.create((function() {
   function rewind() {
     // Stop before rewinding
     this.stop();
-    fire(this, 'fx:rewinded');
+    this.fire('fx:rewinded');
     this.updateAnimation(this.backward ? 1 : 0);
     this.currentTime = null;
     return this;
@@ -135,7 +135,7 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       this.stopAnimation();
-      fire(this, 'fx:ended');
+      this.fire('fx:ended');
 
       FX.Metronome.unregister(this);
       
@@ -148,8 +148,8 @@ FX.Base = Class.create((function() {
     }
   }
   
-  function fire(fx, eventName) {
-    fx.options.eventNotifier.fire(eventName, {fx: fx, data: fx.memoData});
+  function fire(eventName) {
+    this.options.eventNotifier.fire(eventName, {fx: this, data: this.memoData});
   }
 
   // Internal callbacks for subclasses
@@ -176,6 +176,7 @@ FX.Base = Class.create((function() {
     metronomeUpdate: metronomeUpdate,
     startAnimation:  startAnimation,
     stopAnimation:   stopAnimation,
-    updateAnimation: updateAnimation
+    updateAnimation: updateAnimation,
+    fire:            fire
   }
 })());

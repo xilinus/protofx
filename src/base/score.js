@@ -3,15 +3,14 @@
  *  
  **/
 FX.Score = Class.create(FX.Base, (function() {
-  
   /** 
    *  new FX.Score()
    **/
   function initialize($super) {
     $super();
     this.duration  = 0;
-    this.runningFx = new Array();
-    this.effects   =  new Array();
+    this.runningFx = new Array;
+    this.effects   = new Array;
   }
   
   /** 
@@ -32,7 +31,7 @@ FX.Score = Class.create(FX.Base, (function() {
       
     // Reset time for a new play
     if (this.currentTime == null)  {
-      this.rewind();
+      // this.rewind(true);
       computeRunningFxForTime(this, this.backward ? this.duration : 0);
     }
 
@@ -54,7 +53,7 @@ FX.Score = Class.create(FX.Base, (function() {
    *  FX.Score#rewind() -> FX.Base
    *  
    **/
-  function rewind() {
+  function rewind(doNotFireEvent) {
     // Stop before rewinding
     this.stop();
     
@@ -73,6 +72,7 @@ FX.Score = Class.create(FX.Base, (function() {
     this.backward = !this.backward;
     this.currentTime = this.backward ? this.duration : 0;
     
+    if (!doNotFireEvent) this.fire('fx:rewinded');
     return this;
   }
   
@@ -86,7 +86,7 @@ FX.Score = Class.create(FX.Base, (function() {
       var position = options.position;
       var delay    = options.delay || 0;
       if (after && position)
-        throw "Error";
+        throw "Error: Score#add options after and position cannot be set at the same time";
 
       if (after) {
         var afterFx = after.fx || after;

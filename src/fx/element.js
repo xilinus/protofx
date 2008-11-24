@@ -10,20 +10,22 @@ FX.Element = Class.create(FX.Base, (function() {
    **/
   function initialize($super, element, options) {
     $super(options);
-    this.element = $(element);
+    this.element     = $(element);
   }
   
   function animate(attributes) {
-    this.attributes = this.element ? prepareAttributes(attributes, this.element) : attributes;    
+    this.originalAttributes = attributes;    
     return this;
   }
   
   function cloneFor(element) {
-    return new FX.Element(element, this.options).animate(this.attributes);
+    return new FX.Element(element, this.options).animate(this.originalAttributes);
   }
     
   // FX.Score callbacks
   function startAnimation(backward) {
+    this.attributes = this.attributes || prepareAttributes(this.originalAttributes, this.element);
+
     this.attributes.each(function(attribute) {
       attribute.reset(this.element.getStyle(attribute.key), backward);
     }, this);
