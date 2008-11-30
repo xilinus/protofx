@@ -29,6 +29,8 @@ end
 desc "Build all dist files"
 task :build => ['build:packed_base', 'build:packed_full'] do
 end
+desc "Alias for build"
+task :dist => :build
 
 DIST_DIRECTORY           = 'dist'
 BASE_DIST_FILES          = %w(base/base.js base/attribute.js base/metronome.js util/string.js fx/element.js)

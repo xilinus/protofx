@@ -36,7 +36,7 @@ FX.Base = Class.create((function() {
     this.nextTime    = 0;
     this.playing     = false;
     this.backward    = false;
-
+    this.callbacks   = {onEnded: Prototype.emptyFunction}
     this.setOptions(options);
   }
   
@@ -82,7 +82,7 @@ FX.Base = Class.create((function() {
     // Add it to metronome to receive recurring updateAnimation
     FX.Metronome.register(this);
 
-    fire(this, 'fx:started');
+    this.fire('started');
     return this;
   }
   
@@ -93,7 +93,7 @@ FX.Base = Class.create((function() {
    *  fires fx:stopped
    **/
   function stop() {
-    fire(this, 'fx:stopped');
+    this.fire('stopped');
     FX.Metronome.unregister(this);
     this.playing = false;
     return this;
@@ -106,7 +106,7 @@ FX.Base = Class.create((function() {
    *  fire fx:reversed
    **/
   function reverse() {
-    fire(this, 'fx:reversed');
+    this.fire('reversed');
     this.backward = !this.backward;
     return this;
   }
@@ -120,7 +120,7 @@ FX.Base = Class.create((function() {
   function rewind() {
     // Stop before rewinding
     this.stop();
-    fire(this, 'fx:rewinded');
+    this.fire('rewinded');
     this.updateAnimation(this.backward ? 1 : 0);
     this.currentTime = null;
     return this;
@@ -136,7 +136,7 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       this.stopAnimation();
-      fire(this, 'fx:ended');
+      this.fire('ended');
 
       FX.Metronome.unregister(this);
       
@@ -149,17 +149,23 @@ FX.Base = Class.create((function() {
     }
   }
   
-  function fire(fx, eventName) {
-    fx.options.eventNotifier.fire(eventName, {fx: fx, data: fx.memoData});
+  function onEnded(callback) {
+    this.callbacks.onEnded = callback;
+    return this;
+  }
+  
+  function onStarted(callback) {
+    this.callbacks.onStarted = callback;
+    return this;
+  }
+  
+  function fire(eventName) {
+    var callback;
+    if (callback = this.callbacks['on'+ eventName.capitalize()]) callback();
+    this.options.eventNotifier.fire('fx:' + eventName, {fx: this, data: this.memoData});
   }
 
   // Internal callbacks for subclasses
-  function startAnimation(backward) {
-  }
-  
-  function stopAnimation() {
-  }
-  
   // Get (or create) linked group
   function updateAnimation(pos) {
     throw 'FX.Base#updateAnimation(pos) must be implemented'
@@ -175,9 +181,12 @@ FX.Base = Class.create((function() {
     rewind:          rewind,
     isPlaying:       isPlaying,
     metronomeUpdate: metronomeUpdate,
-    startAnimation:  startAnimation,
-    stopAnimation:   stopAnimation,
-    updateAnimation: updateAnimation
+    startAnimation:  Prototype.emptyFunction,
+    stopAnimation:   Prototype.emptyFunction,
+    updateAnimation: updateAnimation,
+    fire:            fire,
+    onStarted:       onStarted,
+    onEnded:         onEnded
   }
 })());
 
@@ -459,16 +468,20 @@ FX.Element = Class.create(FX.Base, (function() {
   }
   
   function animate(attributes) {
-    this.attributes = this.element ? prepareAttributes(attributes, this.element) : attributes;    
+    this.originalAttributes = attributes;    
     return this;
   }
   
   function cloneFor(element) {
-    return new FX.Element(element, this.options).animate(this.attributes);
+    var fx = new FX.Element(element, this.options).animate(this.originalAttributes);
+    fx.callbacks = this.callbacks;
+    return fx;
   }
     
   // FX.Score callbacks
   function startAnimation(backward) {
+    this.attributes = this.attributes || prepareAttributes(this.originalAttributes, this.element);
+
     this.attributes.each(function(attribute) {
       attribute.reset(this.element.getStyle(attribute.key), backward);
     }, this);
@@ -675,15 +688,14 @@ Object.extend(FX.Transition, {
  *  
  **/
 FX.Score = Class.create(FX.Base, (function() {
-  
   /** 
    *  new FX.Score()
    **/
   function initialize($super) {
     $super();
     this.duration  = 0;
-    this.runningFx = new Array();
-    this.effects   =  new Array();
+    this.runningFx = new Array;
+    this.effects   = new Array;
   }
   
   /** 
@@ -704,7 +716,7 @@ FX.Score = Class.create(FX.Base, (function() {
       
     // Reset time for a new play
     if (this.currentTime == null)  {
-      this.rewind();
+      // this.rewind(true);
       computeRunningFxForTime(this, this.backward ? this.duration : 0);
     }
 
@@ -726,7 +738,7 @@ FX.Score = Class.create(FX.Base, (function() {
    *  FX.Score#rewind() -> FX.Base
    *  
    **/
-  function rewind() {
+  function rewind(doNotFireEvent) {
     // Stop before rewinding
     this.stop();
     
@@ -745,6 +757,7 @@ FX.Score = Class.create(FX.Base, (function() {
     this.backward = !this.backward;
     this.currentTime = this.backward ? this.duration : 0;
     
+    if (!doNotFireEvent) this.fire('rewinded');
     return this;
   }
   
@@ -758,7 +771,7 @@ FX.Score = Class.create(FX.Base, (function() {
       var position = options.position;
       var delay    = options.delay || 0;
       if (after && position)
-        throw "Error";
+        throw "Error: Score#add options after and position cannot be set at the same time";
 
       if (after) {
         var afterFx = after.fx || after;

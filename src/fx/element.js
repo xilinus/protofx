@@ -10,7 +10,7 @@ FX.Element = Class.create(FX.Base, (function() {
    **/
   function initialize($super, element, options) {
     $super(options);
-    this.element     = $(element);
+    this.element = $(element);
   }
   
   function animate(attributes) {
@@ -19,7 +19,9 @@ FX.Element = Class.create(FX.Base, (function() {
   }
   
   function cloneFor(element) {
-    return new FX.Element(element, this.options).animate(this.originalAttributes);
+    var fx = new FX.Element(element, this.options).animate(this.originalAttributes);
+    fx.callbacks = this.callbacks;
+    return fx;
   }
     
   // FX.Score callbacks

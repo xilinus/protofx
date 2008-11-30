@@ -72,7 +72,7 @@ FX.Score = Class.create(FX.Base, (function() {
     this.backward = !this.backward;
     this.currentTime = this.backward ? this.duration : 0;
     
-    if (!doNotFireEvent) this.fire('fx:rewinded');
+    if (!doNotFireEvent) this.fire('rewinded');
     return this;
   }
   

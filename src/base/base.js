@@ -35,7 +35,7 @@ FX.Base = Class.create((function() {
     this.nextTime    = 0;
     this.playing     = false;
     this.backward    = false;
-
+    this.callbacks   = {onEnded: Prototype.emptyFunction}
     this.setOptions(options);
   }
   
@@ -81,7 +81,7 @@ FX.Base = Class.create((function() {
     // Add it to metronome to receive recurring updateAnimation
     FX.Metronome.register(this);
 
-    this.fire('fx:started');
+    this.fire('started');
     return this;
   }
   
@@ -92,7 +92,7 @@ FX.Base = Class.create((function() {
    *  fires fx:stopped
    **/
   function stop() {
-    this.fire('fx:stopped');
+    this.fire('stopped');
     FX.Metronome.unregister(this);
     this.playing = false;
     return this;
@@ -105,7 +105,7 @@ FX.Base = Class.create((function() {
    *  fire fx:reversed
    **/
   function reverse() {
-    this.fire('fx:reversed');
+    this.fire('reversed');
     this.backward = !this.backward;
     return this;
   }
@@ -119,7 +119,7 @@ FX.Base = Class.create((function() {
   function rewind() {
     // Stop before rewinding
     this.stop();
-    this.fire('fx:rewinded');
+    this.fire('rewinded');
     this.updateAnimation(this.backward ? 1 : 0);
     this.currentTime = null;
     return this;
@@ -135,7 +135,7 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       this.stopAnimation();
-      this.fire('fx:ended');
+      this.fire('ended');
 
       FX.Metronome.unregister(this);
       
@@ -148,17 +148,23 @@ FX.Base = Class.create((function() {
     }
   }
   
+  function onEnded(callback) {
+    this.callbacks.onEnded = callback;
+    return this;
+  }
+  
+  function onStarted(callback) {
+    this.callbacks.onStarted = callback;
+    return this;
+  }
+  
   function fire(eventName) {
-    this.options.eventNotifier.fire(eventName, {fx: this, data: this.memoData});
+    var callback;
+    if (callback = this.callbacks['on'+ eventName.capitalize()]) callback();
+    this.options.eventNotifier.fire('fx:' + eventName, {fx: this, data: this.memoData});
   }
 
   // Internal callbacks for subclasses
-  function startAnimation(backward) {
-  }
-  
-  function stopAnimation() {
-  }
-  
   // Get (or create) linked group
   function updateAnimation(pos) {
     throw 'FX.Base#updateAnimation(pos) must be implemented'
@@ -174,9 +180,11 @@ FX.Base = Class.create((function() {
     rewind:          rewind,
     isPlaying:       isPlaying,
     metronomeUpdate: metronomeUpdate,
-    startAnimation:  startAnimation,
-    stopAnimation:   stopAnimation,
+    startAnimation:  Prototype.emptyFunction,
+    stopAnimation:   Prototype.emptyFunction,
     updateAnimation: updateAnimation,
-    fire:            fire
+    fire:            fire,
+    onStarted:       onStarted,
+    onEnded:         onEnded
   }
 })());
