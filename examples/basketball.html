@@ -23,12 +23,11 @@
     <div id='ball'>
     </div>
     <script type="text/javascript">
-    document.observe('dom:loaded', function() {
+    Event.observe(window, 'load', function() {
       Object.extend(FX.DefaultOptions, {duration: 2000, transition: FX.Transition.easeOutBounce});
     
       var w = document.viewport.getWidth()  - $('ball').getWidth();
       var h = document.viewport.getHeight() - $('ball').getHeight();
-    
       var fx1 = new FX.Element('ball').animate({left: w});
       var fx2 = new FX.Element('ball').animate({top:  '-=' + h});
       var fx3 = new FX.Element('ball').animate({left: '-=' + w});
@@ -43,7 +42,6 @@
       fxControl(group, true, false);
       $('ball').style.top = h + 'px';
     });
-    generateLoremIpsum(); 
     </script>
 
   </body>
