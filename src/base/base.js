@@ -35,7 +35,7 @@ FX.Base = Class.create((function() {
     this.nextTime    = 0;
     this.playing     = false;
     this.backward    = false;
-    this.callbacks   = {onEnded: Prototype.emptyFunction}
+    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction}
     this.setOptions(options);
   }
   
@@ -70,6 +70,7 @@ FX.Base = Class.create((function() {
   function play() {
     if (this.playing) return;
       
+    this.fire('beforeStarted');
     this.playing = true;
 
     // Reset time for a new play
@@ -158,6 +159,11 @@ FX.Base = Class.create((function() {
     return this;
   }
   
+  function onBeforeStarted(callback) {
+    this.callbacks.onBeforestarted = callback;
+    return this;
+  }
+  
   function fire(eventName) {
     var callback;
     if (callback = this.callbacks['on'+ eventName.capitalize()]) callback();
@@ -185,6 +191,7 @@ FX.Base = Class.create((function() {
     updateAnimation: updateAnimation,
     fire:            fire,
     onStarted:       onStarted,
-    onEnded:         onEnded
+    onEnded:         onEnded,
+    onBeforeStarted: onBeforeStarted
   }
 })());

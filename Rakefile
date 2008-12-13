@@ -33,7 +33,7 @@ desc "Alias for build"
 task :dist => :build
 
 DIST_DIRECTORY           = 'dist'
-BASE_DIST_FILES          = %w(base/base.js base/attribute.js base/metronome.js util/string.js fx/element.js)
+BASE_DIST_FILES          = %w(base/base.js base/attribute.js base/metronome.js util/string.js fx/element.js prototype_ext/element.js)
 BASE_DIST_OUTPUT         = File.join(DIST_DIRECTORY, 'protofx_base.js')
 PACKED_BASE_DIST_OUTPUT  = File.join(DIST_DIRECTORY, 'protofx_base_packed.js')
 

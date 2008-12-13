@@ -36,7 +36,7 @@ FX.Base = Class.create((function() {
     this.nextTime    = 0;
     this.playing     = false;
     this.backward    = false;
-    this.callbacks   = {onEnded: Prototype.emptyFunction}
+    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction}
     this.setOptions(options);
   }
   
@@ -71,6 +71,7 @@ FX.Base = Class.create((function() {
   function play() {
     if (this.playing) return;
       
+    this.fire('beforeStarted');
     this.playing = true;
 
     // Reset time for a new play
@@ -159,6 +160,11 @@ FX.Base = Class.create((function() {
     return this;
   }
   
+  function onBeforeStarted(callback) {
+    this.callbacks.onBeforestarted = callback;
+    return this;
+  }
+  
   function fire(eventName) {
     var callback;
     if (callback = this.callbacks['on'+ eventName.capitalize()]) callback();
@@ -186,7 +192,8 @@ FX.Base = Class.create((function() {
     updateAnimation: updateAnimation,
     fire:            fire,
     onStarted:       onStarted,
-    onEnded:         onEnded
+    onEnded:         onEnded,
+    onBeforeStarted: onBeforeStarted
   }
 })());
 
@@ -515,6 +522,47 @@ FX.Element = Class.create(FX.Base, (function() {
 })());
 
 
+Element.addMethods({
+  fade: function(element, options) {
+    new FX.Element(element)
+      .setOptions(options || {})
+      .animate({opacity: 0})
+      .play();
+    return element;
+  },
+  
+  appear: function(element, options) {
+    new FX.Element(element)
+      .setOptions(options || {})
+      .animate({opacity: 1})
+      .play();
+    return element;
+  },
+  
+  blindUp: function(element, options) {
+    if (!element.visible()) return;
+    
+    new FX.Element(element)
+      .setOptions(options || {})
+      .onBeforeStarted(function() {element.originalHeight = element.style.height})
+      .onEnded(function() {element.hide(); element.style.height = element.originalHeight; (element.originalHeight)})
+      .animate({height: 0})
+      .play();
+    return element;
+  },
+  
+  blindDown: function(element, options) {
+    if (element.visible()) return;
+    var height = element.getHeight();
+    new FX.Element(element)
+      .setOptions(options || {})
+      .onBeforeStarted(function() {element.show(); element.style.height = '0px'})
+      .animate({height: height + 'px'})
+      .play();
+    return element;
+  }
+  
+})
 // t: current time, b: begInnIng value, c: change In value, d: duration
 Object.extend(FX.Transition, {
 	linear: function(x, t, b, c, d) {

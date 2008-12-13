@@ -9,11 +9,11 @@
   color:      #000;
   overflow: hidden;
 }
+
 #block2 {
   left: 240px;
 }
-#block3 {
-}
+
 #ball  {
   position: absolute;
   top:        0px;
@@ -22,4 +22,30 @@
   height:     86px;
   overflow: hidden;
   background: url(ball.gif);
+}
+
+.demo_container {
+  float:left;
+  margin: 10px;
+  text-align: center;
+  border: 1px solid #9ABE8B;
+  padding:0.3em;
+  width: 10em;
+  height: 5em;
+}
+
+.demo_container a {
+  color: #2D99CD;
+}
+
+.demo {
+  float:left;
+  width:      100%;
+  height:     2.5em;
+  background: #DDD;
+  cursor:pointer;
+  text-align: center;
+  line-height: 2.5em;
+  font-size: 1.5em;
+  overflow:hidden;
 }
