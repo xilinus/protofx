@@ -26,17 +26,11 @@
   
     <script type="text/javascript">
     document.observe('dom:loaded', function() {
-      var fx1 = new FX.Element().setOptions({duration:500, transition: FX.Transition.easeInQuad}).animate({opacity: 0});
-      var fx2 = new FX.Element().setOptions({duration:500, transition: FX.Transition.easeOutQuad}).animate({opacity: 1});
-      var group1 = new FX.Score();
-      group1.add(fx1.cloneFor('block3'))
-            .add(fx2.cloneFor('block3'), {position: 'last'})
-            .add(fx1.cloneFor('block3'), {position: 'last'})
-            .add(fx2.cloneFor('block3'), {position: 'last'});
-                      
-      fxControl(group1, true, false);
+      var fx = new FX.Element('block3').setOptions({duration:500, transition: FX.Transition.easeInQuad}).animate({opacity: 0});
+      fx.setCycle('backAndForth', 3);
+      
+      fxControl(fx, true, false);
     });
-    generateLoremIpsum(); 
     </script>
 
   </body>
