@@ -36,7 +36,8 @@ FX.Base = Class.create((function() {
     this.nextTime    = 0;
     this.playing     = false;
     this.backward    = false;
-    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction}
+    this.cycle       = false;
+    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction};
     this.setOptions(options);
   }
   
@@ -63,10 +64,23 @@ FX.Base = Class.create((function() {
   }
   
   /** 
+   *  FX.Base#setCycle(type, count) -> FX.Base
+   *  - type (String): 
+   *    - 'loop' restarts from begin when effect is done
+   *    - 'backAndForth' starts in reverse mode when effect is done
+   *    - 'none' no cycles
+   *  - count (Number): number of cycles to run (default 1)
+   **/
+  function setCycle(type, count) {
+    this.cycle = type == 'none' ? false : {type: type, count: count || 1, current: 0}
+    return this;
+  }
+  
+  /** 
    *  FX.Base#play() -> FX.Base
    *  
    *  Starts animation from current position
-   *  fires fx:started
+   *  fires fx:started, fx:beforeStarted
    **/
   function play() {
     if (this.playing) return;
@@ -124,6 +138,7 @@ FX.Base = Class.create((function() {
     this.fire('rewinded');
     this.updateAnimation(this.backward ? 1 : 0);
     this.currentTime = null;
+    if (this.cycle) this.cycle.current = 1;
     return this;
   }
 
@@ -136,13 +151,31 @@ FX.Base = Class.create((function() {
     if (this.currentTime > this.getDuration() || this.currentTime < 0) {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
-      this.stopAnimation();
-      this.fire('ended');
+      // Check cycle
+      if (this.cycle && this.cycle.current < this.cycle.count) {
+        if (this.cycle.type == 'loop') {
+          this.cycle.current++;
+          this.updateAnimation(this.backward ? 1 : 0);
+          this.currentTime = this.backward ? this.getDuration() : 0;
+        }
+        else if (this.cycle.type == 'backAndForth') {
+          this.reverse();
+          if (this.backward) this.cycle.current++;
+        }
+      }
+      else {
+        this.stopAnimation();
+        this.fire('ended');
 
-      FX.Metronome.unregister(this);
+        FX.Metronome.unregister(this);
       
-      this.currentTime = null;
-      this.playing   = false;
+        this.currentTime = null;
+        this.playing   = false;
+        if (this.cycle) {
+          this.cycle.current = 0;
+          if (this.cycle.type == 'backAndForth') this.backward = !this.backward;
+        }
+      }
     }
     else {
       var pos = this.options.transition(this.currentTime / this.getDuration(), this.currentTime, 0, 1, this.getDuration());
@@ -180,6 +213,7 @@ FX.Base = Class.create((function() {
   return {           
     initialize:      initialize,
     setOptions:      setOptions,
+    setCycle:        setCycle,
     getDuration:     getDuration,
     play:            play,
     stop:            stop,
