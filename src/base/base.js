@@ -68,7 +68,7 @@ FX.Base = Class.create((function() {
    *    - 'loop' restarts from begin when effect is done
    *    - 'backAndForth' starts in reverse mode when effect is done
    *    - 'none' no cycles
-   *  - count (Number): number of cycles to run (default 1)
+   *  - count (Number or "unlimited"): number of cycles to run (default 1)
    **/
   function setCycle(type, count) {
     this.cycle = type == 'none' ? false : {type: type, count: count || 1, current: 0}
@@ -151,7 +151,7 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       // Check cycle
-      if (this.cycle && this.cycle.current < this.cycle.count) {
+      if (this.cycle && (this.cycle.current < this.cycle.count || this.cycle.count == 'unlimited')) {
         if (this.cycle.type == 'loop') {
           this.cycle.current++;
           this.updateAnimation(this.backward ? 1 : 0);
