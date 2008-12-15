@@ -10,7 +10,7 @@
 // Namespace
 FX = {};
 
-// t: current time, b: begInnIng value, c: change In value, d: duration
+// t: current time, b: beginning value, c: change in value, d: duration
 FX.Transition = {
 	swing: function( x, t, b, c, d) {
 		return ((-Math.cos(t/d*Math.PI)/2) + 0.5) * c + b;
