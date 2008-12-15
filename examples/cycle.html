@@ -21,11 +21,15 @@
 
   <body>
     <div id='block3'> Bla Bla Bla </div>
+    <p>Cycle count: <span id="console">0</span></p>
   
     <script type="text/javascript">
     document.observe('dom:loaded', function() {
-      var fx = new FX.Element('block3').setOptions({duration:500, transition: FX.Transition.easeInQuad}).animate({opacity: 0});
-      fx.setCycle('backAndForth', 3);
+      var fx = new FX.Element('block3')
+        .setOptions({duration:500, transition: FX.Transition.easeInQuad})
+        .animate({opacity: 0})
+        .onCycleEnded( function() { $('console').update(fx.cycle.current); } )
+        .setCycle('backAndForth', 'unlimited');
       
       fxControl(fx, true, false);
     });

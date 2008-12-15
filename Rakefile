@@ -7,8 +7,13 @@ task :doc do
   pdoc = 'lib/pdoc/lib/pdoc'
   unless File.exists?(pdoc)
     puts "\nYou'll need PDoc to generate the documentation. Just run:\n\n"
+<<<<<<< HEAD:Rakefile
     puts " $ git submodule init"
     puts " $ git submodule update"
+=======
+    puts "  $ git submodule init"
+    puts "  $ git submodule update"
+>>>>>>> ZenCocoon/master:Rakefile
     puts "\nand you should be all set.\n\n"
   end
   

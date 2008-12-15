@@ -10,7 +10,7 @@
 // Namespace
 FX = {};
 
-// t: current time, b: beginnIng value, c: change In value, d: duration
+// t: current time, b: beginning value, c: change in value, d: duration
 FX.Transition = {
 	swing: function( x, t, b, c, d) {
 		return ((-Math.cos(t/d*Math.PI)/2) + 0.5) * c + b;
@@ -36,7 +36,8 @@ FX.Base = Class.create((function() {
     this.playing     = false;
     this.backward    = false;
     this.cycle       = false;
-    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction};
+    this.callbacks   = {onEnded: Prototype.emptyFunction, onStarted: Prototype.emptyFunction,
+                        onBeforeStarted: Prototype.emptyFunction, onCycleEnded: Prototype.emptyFunction};
     this.setOptions(options);
   }
   
@@ -68,7 +69,7 @@ FX.Base = Class.create((function() {
    *    - 'loop' restarts from begin when effect is done
    *    - 'backAndForth' starts in reverse mode when effect is done
    *    - 'none' no cycles
-   *  - count (Number): number of cycles to run (default 1)
+   *  - count (Number or "unlimited"): number of cycles to run (default 1)
    **/
   function setCycle(type, count) {
     this.cycle = type == 'none' ? false : {type: type, count: count || 1, current: 0}
@@ -149,17 +150,23 @@ FX.Base = Class.create((function() {
     // Unregister from FX.Metronome if time is out of range
     if (this.currentTime > this.getDuration() || this.currentTime < 0) {
       // Force update to last position
-      this.updateAnimation(this.currentTime < 0 ? 0 : 1);
+      this.currentTime = this.currentTime < 0 ? 0 : this.getDuration();
+      this.updateAnimation(this.currentTime);
+
       // Check cycle
-      if (this.cycle && this.cycle.current < this.cycle.count) {
+      if (this.cycle && (this.cycle.current < this.cycle.count || this.cycle.count == 'unlimited')) {
         if (this.cycle.type == 'loop') {
           this.cycle.current++;
+          this.fire('cycleEnded');
           this.updateAnimation(this.backward ? 1 : 0);
           this.currentTime = this.backward ? this.getDuration() : 0;
         }
         else if (this.cycle.type == 'backAndForth') {
           this.reverse();
-          if (this.backward) this.cycle.current++;
+          if (this.backward) {
+            this.cycle.current++;
+            this.fire('cycleEnded');
+          }
         }
       }
       else {
@@ -197,6 +204,11 @@ FX.Base = Class.create((function() {
     return this;
   }
   
+  function onCycleEnded(callback) {
+    this.callbacks.onCycleended = callback;
+    return this;
+  }
+  
   function fire(eventName) {
     var callback;
     if (callback = this.callbacks['on'+ eventName.capitalize()]) callback();
@@ -226,6 +238,7 @@ FX.Base = Class.create((function() {
     fire:            fire,
     onStarted:       onStarted,
     onEnded:         onEnded,
-    onBeforeStarted: onBeforeStarted
+    onBeforeStarted: onBeforeStarted,
+    onCycleEnded:    onCycleEnded
   }
 })());
