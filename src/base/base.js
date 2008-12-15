@@ -135,12 +135,12 @@ FX.Base = Class.create((function() {
       // Force update to last position
       this.updateAnimation(this.currentTime < 0 ? 0 : 1);
       this.stopAnimation();
-      this.fire('ended');
 
       FX.Metronome.unregister(this);
       
       this.currentTime = null;
       this.playing   = false;
+      this.fire('ended');
     }
     else {
       var pos = this.options.transition(this.currentTime / this.getDuration(), this.currentTime, 0, 1, this.getDuration());
