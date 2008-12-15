@@ -4,7 +4,15 @@ require 'rake/rdoctask'
 
 desc "Generates documentation"
 task :doc do
-  require 'lib/pdoc/lib/pdoc'
+  pdoc = 'lib/pdoc/lib/pdoc'
+  unless File.exists?(pdoc)
+    puts "\nYou'll need PDoc to generate the documentation. Just run:\n\n"
+    puts " $ git submodule init"
+    puts " $ git submodule update"
+    puts "\nand you should be all set.\n\n"
+  end
+  
+  require pdoc
   require 'fileutils'
   require 'tempfile'
   
@@ -33,7 +41,7 @@ desc "Alias for build"
 task :dist => :build
 
 DIST_DIRECTORY           = 'dist'
-BASE_DIST_FILES          = %w(base/base.js base/attribute.js base/metronome.js util/string.js fx/element.js)
+BASE_DIST_FILES          = %w(base/base.js base/attribute.js base/metronome.js util/string.js fx/element.js prototype_ext/element.js)
 BASE_DIST_OUTPUT         = File.join(DIST_DIRECTORY, 'protofx_base.js')
 PACKED_BASE_DIST_OUTPUT  = File.join(DIST_DIRECTORY, 'protofx_base_packed.js')
 

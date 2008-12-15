@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
   	<title>Prototype FX</title>
     <script type="text/javascript" src="../lib/prototype.js"></script>
@@ -23,20 +21,18 @@
 
   <body>
     <div id='block3'> Bla Bla Bla </div>
+    <p>Cycle count: <span id="console">0</span></p>
   
     <script type="text/javascript">
     document.observe('dom:loaded', function() {
-      var fx1 = new FX.Element().setOptions({duration:500, transition: FX.Transition.easeInQuad}).animate({opacity: 0});
-      var fx2 = new FX.Element().setOptions({duration:500, transition: FX.Transition.easeOutQuad}).animate({opacity: 1});
-      var group1 = new FX.Score();
-      group1.add(fx1.cloneFor('block3'))
-            .add(fx2.cloneFor('block3'), {position: 'last'})
-            .add(fx1.cloneFor('block3'), {position: 'last'})
-            .add(fx2.cloneFor('block3'), {position: 'last'});
-                      
-      fxControl(group1, true, false);
+      var fx = new FX.Element('block3')
+        .setOptions({duration:500, transition: FX.Transition.easeInQuad})
+        .animate({opacity: 0})
+        .onCycleEnded( function() { $('console').update(fx.getCycle()); } )
+        .setCycle('backAndForth', 10);
+      
+      fxControl(fx, true, false);
     });
-    generateLoremIpsum(); 
     </script>
 
   </body>

@@ -123,6 +123,11 @@ FX.Score = Class.create(FX.Base, (function() {
     
     // Unregister from FX.Metronome if time is out of range
     if (this.currentTime > this.duration || this.currentTime <0) {
+      this.runningFx.each(function(fxInfo) {
+        fxInfo.fx.updateAnimation(this.backward ? 0 : 1);
+        fxInfo.fx.stopAnimation();
+      }, this);
+      
       FX.Metronome.unregister(this);
       this.currentTime = null;
       this.playing   = false;

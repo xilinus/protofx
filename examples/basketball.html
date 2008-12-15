@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
   	<title>Prototype FX</title>
     <script type="text/javascript" src="../lib/prototype.js"></script>
@@ -20,15 +18,14 @@
   </head>
 
   <body>
-    <div id='ball'>
-    </div>
+    <div id='ball'></div>
     <script type="text/javascript">
+    
     document.observe('dom:loaded', function() {
       Object.extend(FX.DefaultOptions, {duration: 2000, transition: FX.Transition.easeOutBounce});
     
       var w = document.viewport.getWidth()  - $('ball').getWidth();
       var h = document.viewport.getHeight() - $('ball').getHeight();
-    
       var fx1 = new FX.Element('ball').animate({left: w});
       var fx2 = new FX.Element('ball').animate({top:  '-=' + h});
       var fx3 = new FX.Element('ball').animate({left: '-=' + w});
@@ -43,7 +40,6 @@
       fxControl(group, true, false);
       $('ball').style.top = h + 'px';
     });
-    generateLoremIpsum(); 
     </script>
 
   </body>

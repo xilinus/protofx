@@ -27,7 +27,6 @@ FX.Element = Class.create(FX.Base, (function() {
   // FX.Score callbacks
   function startAnimation(backward) {
     this.attributes = this.attributes || prepareAttributes(this.originalAttributes, this.element);
-
     this.attributes.each(function(attribute) {
       attribute.reset(this.element.getStyle(attribute.key), backward);
     }, this);
