@@ -76,6 +76,11 @@ FX.Base = Class.create((function() {
     return this;
   }
   
+  /** 
+   *  FX.Base#getCycle() -> int
+   *  
+   *  Returns current cycle position
+   **/
   function getCycle() {
     return this.cycle ? this.cycle.current : 1
   }
